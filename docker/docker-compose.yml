@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  db:
+    image: surrealdb/surrealdb:latest
+    container_name: db
+    restart: unless-stopped
+    command: start --user root --pass password1
+    ports:
+      - "8000:8000"
+    volumes:
+      - db:/data
+
+  keycloak-db:
+    image: postgres:latest
+    volumes:
+      - kc_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password1
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password1
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password1
+    command:
+      - "start-dev"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak-db
+
+
+volumes:
+  db:
+  kc_data:

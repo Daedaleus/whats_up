@@ -1,0 +1,23 @@
+.menu-entry {
+    display: inline-block;
+    line-height: 50px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: white;
+    text-transform: capitalize;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+.menu-entry:hover {
+    background-color: #111;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:visited {
+    color: white;
+    text-decoration: none;
+}

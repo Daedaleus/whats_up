@@ -1,0 +1,16 @@
+.top-menu {
+    background-color: #333;
+    height: 50px;
+    width: 100%;
+}
+
+.top-menu-title {
+    color: white;
+    font-size: 20px;
+    float: left;
+    padding: 14px 16px;
+}
+
+.top-menu-buttons {
+    float: right;
+}
