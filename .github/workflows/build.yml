@@ -17,6 +17,8 @@ jobs:
         working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
+      - name: Go in Backend
+        run: cd ./backend
       - uses: actions-rs/toolchain@v1
         with:
           working-directory: ./backend
