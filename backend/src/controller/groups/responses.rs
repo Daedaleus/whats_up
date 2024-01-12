@@ -20,7 +20,7 @@ impl From<Group> for GroupResponse {
 
 impl From<&Group> for GroupResponse {
     fn from(group: &Group) -> Self {
-        let id = group.id.clone().map(|id| id.to_string());
+        let id = group.id.map(|id| id.to_string());
         let name = group.name.clone();
         Self { id, name }
     }

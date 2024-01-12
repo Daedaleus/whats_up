@@ -3,9 +3,9 @@ mod health;
 mod middleware;
 mod users;
 
+use crate::controller::groups::logic::group_handler;
 use crate::controller::middleware::keycloak::auth;
 use crate::controller::users::logic::users_handler;
-use crate::controller::groups::logic::group_handler;
 use axum::routing::get;
 use axum::Router;
 use color_eyre::Report;
