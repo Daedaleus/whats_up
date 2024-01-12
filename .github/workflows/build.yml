@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
+          working-directory: ./backend
           toolchain: stable
           components: rustfmt
           override: true
@@ -26,6 +27,7 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
+          working-directory: ./backend
 
   clippy:
     name: Clippy
@@ -37,11 +39,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
+          working-directory: ./backend
           toolchain: stable
           components: clippy
           override: true
       - uses: actions/cache@v3
         with:
+          working-directory: ./backend
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
@@ -53,6 +57,7 @@ jobs:
             ${{ runner.os }}-cargo
       - uses: actions-rs/cargo@v1
         with:
+          working-directory: ./backend
           command: clippy
           args: -- -D warnings
 
@@ -76,10 +81,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
+          working-directory: ./backend
           toolchain: stable
           override: true
       - uses: actions/cache@v3
         with:
+          working-directory: ./backend
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
@@ -91,5 +98,6 @@ jobs:
             ${{ runner.os }}-cargo
       - uses: actions-rs/cargo@v1
         with:
+          working-directory: ./backend
           command: build
           args: --release
