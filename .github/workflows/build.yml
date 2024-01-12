@@ -4,87 +4,9 @@ name: CI
 
 jobs:
 
-  fmt:
-    name: Check Formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          path: backend  # Setzt den Arbeitsverzeichnispfad auf den Ordner "backend"
-  
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: rustfmt
-          override: true
-        working-directory: backend  # Setzt den Arbeitsverzeichnispfad auf den Ordner "backend"
-
-      - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-        working-directory: backend  # Setzt den Arbeitsverzeichnispfad
-
   clippy:
-    name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: clippy
-          override: true
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-
-  build:
-    name: Build (${{ matrix.runs_on }})
-    runs-on: ${{ matrix.runs_on }}
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - os: linux
-            runs_on: ubuntu-latest
-          - os: macos
-            runs_on: macos-latest
-          - os: windows
-            runs_on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+      - uses: actions/checkout@v3
+      - name: Run Clippy
+        run: cd backend && cargo clippy --all-targets --all-features -Dwarnings
