@@ -1,6 +1,7 @@
 use color_eyre::Report;
 
 mod controller;
+pub(crate) mod error;
 mod repository;
 mod service;
 

@@ -1,14 +1,15 @@
-use crate::controller::middleware::keycloak::extract_token;
-use crate::controller::users::responses::{JoinGroupRequest, UserResponse};
-use crate::controller::AppState;
-use crate::repository::group::get_group_by_name;
-use crate::repository::user::add_group_to_user;
+use std::sync::Arc;
+
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::{get, patch, post};
 use axum::{Json, Router};
 use reqwest::header::HeaderMap;
-use std::sync::Arc;
+
+use crate::controller::middleware::keycloak::extract_token;
+use crate::controller::users::responses::UserResponse;
+use crate::controller::AppState;
+use crate::error::WhatsUpError::{GroupNotFound, GroupRequestParseError};
 
 pub(crate) fn users_handler() -> Router<Arc<AppState>> {
     Router::new()
@@ -42,58 +43,35 @@ pub(crate) async fn join_group(
         Err(_) => return StatusCode::UNAUTHORIZED,
     };
 
-    let user = crate::service::users::get_account(state.clone(), token).await;
+    let user = crate::service::users::get_account(state.clone(), token.clone()).await;
     if user.is_err() {
         return StatusCode::UNAUTHORIZED;
     }
-    let user = user.unwrap();
-    let group_req: JoinGroupRequest = match serde_json::from_str(&group_req) {
-        Ok(group_req) => group_req,
-        Err(_) => return StatusCode::BAD_REQUEST,
-    };
 
-    let group = get_group_by_name(
-        state.client.clone(),
-        state.db_name.clone(),
-        group_req.name.clone(),
-    )
-    .await;
-    if group.is_err() {
-        return StatusCode::NOT_FOUND;
+    match crate::service::users::join_group(state.clone(), user.unwrap(), group_req).await {
+        Ok(_) => StatusCode::ACCEPTED,
+        Err(GroupRequestParseError) => StatusCode::BAD_REQUEST,
+        Err(GroupNotFound) => StatusCode::NOT_FOUND,
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
     }
-    let result = add_group_to_user(
-        state.client.clone(),
-        state.db_name.clone(),
-        user.clone(),
-        group.unwrap(),
-    )
-    .await;
-
-    if result.is_err() {
-        return StatusCode::NOT_FOUND;
-    }
-
-    StatusCode::ACCEPTED
 }
 
 pub(crate) async fn toggle_ready(
     headers: HeaderMap,
     State(state): State<Arc<AppState>>,
 ) -> StatusCode {
-    let auth_header = headers.get("Authorization");
-    if auth_header.is_none() {
-        return StatusCode::UNAUTHORIZED;
-    }
-    let token = headers.get("Authorization").unwrap().to_str().unwrap();
-    let token = token.replace("Bearer ", "");
+    let token = match extract_token(headers).await {
+        Ok(token) => token,
+        Err(_) => return StatusCode::UNAUTHORIZED,
+    };
+
     let user = crate::service::users::get_account(state.clone(), token).await;
     if user.is_err() {
         return StatusCode::UNAUTHORIZED;
     }
-    let user = user.unwrap();
-    let result = crate::service::users::toggle_ready(state.clone(), user).await;
-    if result.is_err() {
-        return StatusCode::UNAUTHORIZED;
+
+    match crate::service::users::toggle_ready(state.clone(), user.unwrap()).await {
+        Ok(_) => StatusCode::ACCEPTED,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }
-    StatusCode::ACCEPTED
 }

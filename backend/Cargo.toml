@@ -18,4 +18,4 @@ mongodb = "2.7"
 futures = "0.3"
 color-eyre = "0.6"
 reqwest = { version = "0.11", features = ["json"] }
-jwt = "0.16"
+thiserror = "1.0"

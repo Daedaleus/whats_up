@@ -1,32 +1,16 @@
 use std::sync::Arc;
 
-use color_eyre::Report;
-use serde::Deserialize;
-
+use crate::controller::middleware::keycloak::get_user_name_from_info;
+use crate::controller::users::responses::JoinGroupRequest;
 use crate::controller::AppState;
-use crate::repository::user::{create_user, get_user_by_name, User};
-
-#[allow(dead_code)]
-#[derive(Deserialize)]
-struct UserInfo {
-    sub: String,
-    email_verified: bool,
-    name: String,
-    preferred_username: String,
-    given_name: String,
-    family_name: String,
-    email: String,
-}
+use crate::error::WhatsUpError;
+use crate::error::WhatsUpError::{GroupAddError, GroupNotFound, GroupRequestParseError};
+use crate::repository::group::get_group_by_name;
+use crate::repository::user::{add_group_to_user, create_user, get_user_by_name, User};
+use color_eyre::Report;
 
 pub(crate) async fn get_account(state: Arc<AppState>, token: String) -> Result<User, Report> {
-    let client = reqwest::Client::new();
-    let response = client
-        .get("http://localhost:8080/realms/whats_up/protocol/openid-connect/userinfo")
-        .bearer_auth(token)
-        .send()
-        .await?;
-    let userinfo = response.json::<UserInfo>().await?;
-    let username = userinfo.preferred_username.clone();
+    let username = get_user_name_from_info(token).await?;
 
     let user = get_user_by_name(
         state.client.clone(),
@@ -45,9 +29,42 @@ pub(crate) async fn get_account(state: Arc<AppState>, token: String) -> Result<U
     }
 }
 
-pub(crate) async fn toggle_ready(state: Arc<AppState>, user: User) -> Result<bool, Report> {
-    let sucess =
-        crate::repository::user::toggle_ready(state.client.clone(), state.db_name.clone(), user)
-            .await?;
-    Ok(sucess)
+pub(crate) async fn join_group(
+    state: Arc<AppState>,
+    user: User,
+    group_req: String,
+) -> Result<(), WhatsUpError> {
+    let group_req: JoinGroupRequest = match serde_json::from_str(&group_req) {
+        Ok(group_req) => group_req,
+        Err(_) => return Err(GroupRequestParseError),
+    };
+
+    let group = get_group_by_name(
+        state.client.clone(),
+        state.db_name.clone(),
+        group_req.name.clone(),
+    )
+    .await;
+    if group.is_err() {
+        return Err(GroupNotFound);
+    }
+    let result = add_group_to_user(
+        state.client.clone(),
+        state.db_name.clone(),
+        user,
+        group.unwrap(),
+    )
+    .await;
+
+    if result.is_err() {
+        return Err(GroupAddError);
+    }
+
+    Ok(())
+}
+
+pub(crate) async fn toggle_ready(state: Arc<AppState>, user: User) -> Result<(), Report> {
+    crate::repository::user::toggle_ready(state.client.clone(), state.db_name.clone(), user)
+        .await?;
+    Ok(())
 }

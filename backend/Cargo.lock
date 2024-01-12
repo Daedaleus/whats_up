@@ -149,11 +149,11 @@ dependencies = [
  "axum",
  "color-eyre",
  "futures",
- "jwt",
  "mongodb",
  "reqwest",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio",
  "tower",
  "tower-http",
@@ -958,21 +958,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cee9c64da59eae3b50095c18d3e74f8b73c0b86d2792824ff01bbce68ba229ca"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "jwt"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6204285f77fe7d9784db3fdc449ecce1a0114927a51d5a41c4c7a292011c015f"
-dependencies = [
- "base64 0.13.1",
- "crypto-common",
- "digest",
- "hmac",
- "serde",
- "serde_json",
- "sha2",
 ]
 
 [[package]]

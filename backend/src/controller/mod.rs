@@ -1,19 +1,21 @@
-mod groups;
-mod health;
-mod middleware;
-mod users;
+use std::net::SocketAddr;
+use std::sync::Arc;
+
+use axum::routing::get;
+use axum::Router;
+use color_eyre::Report;
+use tower_http::trace;
+use tower_http::trace::TraceLayer;
+use tracing::Level;
 
 use crate::controller::groups::logic::group_handler;
 use crate::controller::middleware::keycloak::auth;
 use crate::controller::users::logic::users_handler;
-use axum::routing::get;
-use axum::Router;
-use color_eyre::Report;
-use std::net::SocketAddr;
-use std::sync::Arc;
-use tower_http::trace;
-use tower_http::trace::TraceLayer;
-use tracing::Level;
+
+mod groups;
+mod health;
+pub(crate) mod middleware;
+pub(crate) mod users;
 
 pub(crate) async fn init(ip: [u8; 4], port: u16, state: AppState) -> Result<(), Report> {
     tracing_subscriber::fmt()
