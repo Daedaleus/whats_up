@@ -23,6 +23,6 @@ Application to see if your friends are available to hang out.
 ## ToDo
 
 * [ ] Add tests
-* [/] Add CI/CD
+* [x] Add CI/CD
 * [ ] Add frontend
 * [ ] Add App for iOS and Android
