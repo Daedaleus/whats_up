@@ -2,21 +2,13 @@ use std::sync::Arc;
 
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::routing::{get, patch, post};
-use axum::{Json, Router};
+use axum::Json;
 use reqwest::header::HeaderMap;
 
 use crate::controller::middleware::keycloak::extract_token;
 use crate::controller::users::responses::UserResponse;
 use crate::controller::AppState;
 use crate::error::*;
-
-pub(crate) fn users_handler() -> Router<Arc<AppState>> {
-    Router::new()
-        .route("/me", get(get_account))
-        .route("/join", post(join_group))
-        .route("/ready", patch(toggle_ready))
-}
 
 pub(crate) async fn get_account(
     headers: HeaderMap,

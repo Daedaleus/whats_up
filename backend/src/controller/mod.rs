@@ -8,9 +8,9 @@ use tower_http::trace;
 use tower_http::trace::TraceLayer;
 use tracing::Level;
 
-use crate::controller::groups::logic::group_handler;
+use crate::controller::groups::group_handler;
 use crate::controller::middleware::keycloak::auth;
-use crate::controller::users::logic::users_handler;
+use crate::controller::users::users_handler;
 
 pub(crate) mod groups;
 mod health;
