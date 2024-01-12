@@ -26,5 +26,5 @@ pub(crate) async fn create_group(
 ) -> Json<InsertOneResultResponse> {
     let result = crate::service::groups::create_group(state.clone(), group).await;
 
-    Json(result.into())
+    Json(result)
 }

@@ -1,11 +1,11 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum WhatsUpError {
+pub enum GroupError {
     #[error("Could not parse group request")]
-    GroupRequestParseError,
+    RequestParseError,
     #[error("Could not find group")]
-    GroupNotFound,
+    NotFound,
     #[error("Could not add group to user")]
-    GroupAddError,
+    AddError,
 }

@@ -9,7 +9,7 @@ use reqwest::header::HeaderMap;
 use crate::controller::middleware::keycloak::extract_token;
 use crate::controller::users::responses::UserResponse;
 use crate::controller::AppState;
-use crate::error::WhatsUpError::{GroupNotFound, GroupRequestParseError};
+use crate::error::*;
 
 pub(crate) fn users_handler() -> Router<Arc<AppState>> {
     Router::new()
@@ -50,8 +50,8 @@ pub(crate) async fn join_group(
 
     match crate::service::users::join_group(state.clone(), user.unwrap(), group_req).await {
         Ok(_) => StatusCode::ACCEPTED,
-        Err(GroupRequestParseError) => StatusCode::BAD_REQUEST,
-        Err(GroupNotFound) => StatusCode::NOT_FOUND,
+        Err(GroupError::RequestParseError) => StatusCode::BAD_REQUEST,
+        Err(GroupError::NotFound) => StatusCode::NOT_FOUND,
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }

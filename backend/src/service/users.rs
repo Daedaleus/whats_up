@@ -3,8 +3,7 @@ use std::sync::Arc;
 use crate::controller::middleware::keycloak::get_user_name_from_info;
 use crate::controller::users::responses::JoinGroupRequest;
 use crate::controller::AppState;
-use crate::error::WhatsUpError;
-use crate::error::WhatsUpError::{GroupAddError, GroupNotFound, GroupRequestParseError};
+use crate::error::*;
 use crate::repository::group::get_group_by_name;
 use crate::repository::user::{add_group_to_user, create_user, get_user_by_name, User};
 use color_eyre::Report;
@@ -33,10 +32,10 @@ pub(crate) async fn join_group(
     state: Arc<AppState>,
     user: User,
     group_req: String,
-) -> Result<(), WhatsUpError> {
+) -> Result<(), GroupError> {
     let group_req: JoinGroupRequest = match serde_json::from_str(&group_req) {
         Ok(group_req) => group_req,
-        Err(_) => return Err(GroupRequestParseError),
+        Err(_) => return Err(GroupError::RequestParseError),
     };
 
     let group = get_group_by_name(
@@ -46,7 +45,7 @@ pub(crate) async fn join_group(
     )
     .await;
     if group.is_err() {
-        return Err(GroupNotFound);
+        return Err(GroupError::NotFound);
     }
     let result = add_group_to_user(
         state.client.clone(),
@@ -57,7 +56,7 @@ pub(crate) async fn join_group(
     .await;
 
     if result.is_err() {
-        return Err(GroupAddError);
+        return Err(GroupError::AddError);
     }
 
     Ok(())
