@@ -1,18 +1,11 @@
 use std::sync::Arc;
 
 use axum::extract::State;
-use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::Json;
 
 use crate::controller::groups::responses::{GroupResponse, InsertOneResultResponse};
 use crate::controller::AppState;
 use crate::repository::group::Group;
-
-pub(crate) fn group_handler() -> Router<Arc<AppState>> {
-    Router::new()
-        .route("/", get(get_groups))
-        .route("/", post(create_group))
-}
 
 pub(crate) async fn get_groups(State(state): State<Arc<AppState>>) -> Json<Vec<GroupResponse>> {
     let groups = crate::service::groups::get_groups(state.clone()).await;
