@@ -1,2 +1,2 @@
 pub(crate) mod logic;
-mod responses;
+pub(crate) mod responses;

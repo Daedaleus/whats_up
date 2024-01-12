@@ -12,7 +12,7 @@ use crate::controller::groups::logic::group_handler;
 use crate::controller::middleware::keycloak::auth;
 use crate::controller::users::logic::users_handler;
 
-mod groups;
+pub(crate) mod groups;
 mod health;
 pub(crate) mod middleware;
 pub(crate) mod users;

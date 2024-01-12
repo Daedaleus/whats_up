@@ -6,7 +6,6 @@ use axum::{Json, Router};
 
 use crate::controller::groups::responses::{GroupResponse, InsertOneResultResponse};
 use crate::controller::AppState;
-use crate::repository;
 use crate::repository::group::Group;
 
 pub(crate) fn group_handler() -> Router<Arc<AppState>> {
@@ -16,10 +15,8 @@ pub(crate) fn group_handler() -> Router<Arc<AppState>> {
 }
 
 pub(crate) async fn get_groups(State(state): State<Arc<AppState>>) -> Json<Vec<GroupResponse>> {
-    let groups = repository::group::get_groups(state.client.clone(), state.db_name.clone())
-        .await
-        .unwrap_or(Vec::new());
-    let groups: Vec<GroupResponse> = groups.iter().map(|group| group.into()).collect();
+    let groups = crate::service::groups::get_groups(state.clone()).await;
+
     Json(groups)
 }
 
@@ -27,9 +24,7 @@ pub(crate) async fn create_group(
     State(state): State<Arc<AppState>>,
     Json(group): Json<Group>,
 ) -> Json<InsertOneResultResponse> {
-    let result =
-        repository::group::create_group(state.client.clone(), state.db_name.clone(), group)
-            .await
-            .unwrap();
+    let result = crate::service::groups::create_group(state.clone(), group).await;
+
     Json(result.into())
 }
