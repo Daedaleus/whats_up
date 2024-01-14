@@ -20,9 +20,14 @@ Application to see if your friends are available to hang out.
 6. Add to keycloak client "app" the scope "openid"
 6. Create user(s) in keycloak in realm "whats_up"
 
+### Help
+
+OpenApi documentation is available at /openapi.json in (running) backend
+
 ## ToDo
 
 * [ ] Add tests
 * [x] Add CI/CD
+* [x] Documentation
 * [ ] Add frontend
 * [ ] Add App for iOS and Android

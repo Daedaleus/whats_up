@@ -1,12 +1,13 @@
 use crate::repository::user::User;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub(crate) struct JoinGroupRequest {
     pub(crate) name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct UserResponse {
     id: Option<String>,
     name: String,

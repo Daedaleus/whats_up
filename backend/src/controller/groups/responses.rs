@@ -1,9 +1,10 @@
 use mongodb::results::InsertOneResult;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use crate::repository::group::Group;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct GroupResponse {
     id: Option<String>,
     name: String,

@@ -12,6 +12,7 @@ use crate::controller::groups::group_handler;
 use crate::controller::middleware::keycloak::auth;
 use crate::controller::users::users_handler;
 
+mod doc;
 pub(crate) mod groups;
 mod health;
 pub(crate) mod middleware;
@@ -29,12 +30,13 @@ pub(crate) async fn init(ip: [u8; 4], port: u16, state: AppState) -> Result<(), 
         .nest(
             "/api/v1",
             Router::new()
-                .route("/health", get(health::health))
                 .nest("/groups", group_handler())
                 .nest("/users", users_handler()),
         )
         .with_state(shared_state)
         .layer(axum::middleware::from_fn(auth))
+        .route("/health", get(health::health))
+        .route("/openapi.json", get(doc::openapi))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
