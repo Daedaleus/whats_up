@@ -10,6 +10,14 @@ use crate::controller::users::responses::UserResponse;
 use crate::controller::AppState;
 use crate::error::*;
 
+/// Get account
+#[utoipa::path(get, path = "/api/v1/users/me",
+    responses(
+        (status = 200, description = "Successfully retrieved account"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    )
+)]
 pub(crate) async fn get_account(
     headers: HeaderMap,
     State(state): State<Arc<AppState>>,
@@ -25,6 +33,17 @@ pub(crate) async fn get_account(
     }
 }
 
+/// Join group by id
+#[utoipa::path(post, path = "/api/v1/users/join",
+    responses(
+        (status = 202, description = "Successfully joined group"),
+        (status = 400, description = "Request body is invalid"),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "Group not found"),
+        (status = 500, description = "Internal server error"),
+    ),
+    params( ("name" = String, description = "Name of the group to join") )
+)]
 pub(crate) async fn join_group(
     headers: HeaderMap,
     State(state): State<Arc<AppState>>,
@@ -48,6 +67,14 @@ pub(crate) async fn join_group(
     }
 }
 
+/// Toggle ready status
+#[utoipa::path(patch, path = "/api/v1/users/ready",
+    responses(
+        (status = 202, description = "Successfully toggled ready status"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error"),
+    )
+)]
 pub(crate) async fn toggle_ready(
     headers: HeaderMap,
     State(state): State<Arc<AppState>>,

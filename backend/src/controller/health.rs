@@ -11,6 +11,12 @@ impl Default for Health {
     }
 }
 
+#[utoipa::path(get, path = "/health",
+    responses(
+        (status = 200, description = "Successfully retrieved health status"),
+        (status = 500, description = "Internal server error"),
+    )
+)]
 pub async fn health() -> Json<Health> {
     let status = Health::default();
     Json(status)
